@@ -59,7 +59,7 @@ const Home = () => {
                     <div
                       key={index}
                       onClick={() => handleGetPrompt(topic)}
-                      className="text-center cursor-pointer border rounded-full text-xs py-1 px-2 border-[#8ABEEC] text-[#8ABEEC]"
+                      className="text-center cursor-pointer border rounded-full text-sm py-1 px-2 border-[#8ABEEC] text-[#8ABEEC]"
                       style={{
                         flexBasis: index < 3 ? "auto" : "auto", // all items auto width
                       }}
