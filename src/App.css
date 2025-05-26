@@ -1,0 +1,5 @@
+:root{
+  background: white;
+
+  --safe-bottom: env(safe-area-inset-bottom);
+}
