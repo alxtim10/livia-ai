@@ -1,4 +1,3 @@
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Lottie from "lottie-react";
 import animationData from '../../constants/loading.json'
 

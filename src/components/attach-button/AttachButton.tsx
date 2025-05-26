@@ -1,5 +1,5 @@
 import { Image } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 
 const AttachButton = ({ onFileChange }: { onFileChange: (file: File | null) => void }) => {
 
