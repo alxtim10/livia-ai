@@ -21,7 +21,7 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [topics, setTopics] = useState<string[]>();
   const [showModal, setShowModal] = useState(false);
-  const [models, setModels] = useState<{ model_id: string, model_name: string }[]>([{
+  const [models] = useState<{ model_id: string, model_name: string }[]>([{
     model_id: "gemini-2.5-flash-preview-05-20",
     model_name: "Livia"
   }]);

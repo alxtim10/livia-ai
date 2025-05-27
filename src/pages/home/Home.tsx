@@ -1,6 +1,6 @@
 import ChatBox from "../../components/chat-box/ChatBox";
-import { ArrowDown, ArrowUp, Info, Square, X } from "lucide-react";
-import { useHome, useScrollableNotAtBottom } from "./hooks";
+import { ArrowUp, Info, Square, X } from "lucide-react";
+import { useHome } from "./hooks";
 import AttachButton from "../../components/attach-button/AttachButton";
 import Dropdown from "../../components/dropdown/Dropdown";
 import InfoDrawer from "../../components/drawer-info/InfoDrawer";
