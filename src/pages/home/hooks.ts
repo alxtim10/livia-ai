@@ -21,7 +21,11 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [topics, setTopics] = useState<string[]>();
   const [showModal, setShowModal] = useState(false);
-  const [models, setModels] = useState<{ model_id: string, model_name: string }[]>([]);
+  const [models] = useState<{ model_id: string, model_name: string }[]>([{
+    model_id: "gemini-2.5-flash-preview-05-20",
+    model_name: "Livia"
+  }]);
+  const [firstLoading, setFirstLoading] = useState<boolean>(true);
 
   const toggleDrawer = () => {
     setShowModal((prevState) => !prevState)
@@ -134,7 +138,7 @@ export const useHome = () => {
             },
             body: JSON.stringify({
               prompt: suggestion ? suggestion : query,
-              model: models[engine].model_id
+              model: "gemini-2.5-flash-preview-05-20"
             }),
           }
         );
@@ -158,7 +162,7 @@ export const useHome = () => {
         const formData = new FormData();
         formData.append("file", image);
         formData.append("prompt", suggestion ? suggestion : query);
-        formData.append("model", models[engine].model_id);
+        formData.append("model", "gemini-2.5-flash-preview-05-20");
 
         res = await fetch(
           `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
@@ -242,23 +246,8 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if (token) {
-      const getModels = async () => {
-        let res;
-        res = await fetch(
-          `${process.env.REACT_APP_API_LIVIA}/Model`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`,
-            },
-          }
-        );
-        const data = await res.json();
-        setModels(data.data);
-      }
-      getModels();
+    if(token) {
+      setFirstLoading(false);
     }
   }, [token])
 
@@ -283,6 +272,48 @@ export const useHome = () => {
     topics,
     showModal,
     toggleDrawer,
-    models
+    models,
+    firstLoading
   };
 };
+
+export function useScrollableNotAtBottom(targetId?: string) {
+  const [isScrollable, setIsScrollable] = useState(false);
+  const [notAtBottom, setNotAtBottom] = useState(false);
+
+  useEffect(() => {
+    const el = targetId
+      ? document.getElementById(targetId)
+      : document.documentElement;
+
+    if (!el) return;
+
+    const checkScroll = () => {
+      const scrollHeight = el.scrollHeight;
+      const clientHeight = el.clientHeight;
+      const scrollTop = el.scrollTop;
+
+      const canScroll = scrollHeight > clientHeight;
+      const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+      setIsScrollable(canScroll);
+      setNotAtBottom(canScroll && !atBottom);
+    };
+
+    const resizeObserver = new ResizeObserver(checkScroll);
+    resizeObserver.observe(el);
+
+    window.addEventListener("scroll", checkScroll);
+    window.addEventListener("resize", checkScroll);
+
+    checkScroll(); // initial check
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [targetId]);
+
+  return { isScrollable, notAtBottom };
+}

@@ -1,5 +1,4 @@
 import { ChangeEvent, KeyboardEvent, useRef } from "react";
-import { ArrowUp, Plus } from "lucide-react";
 
 interface FirstLoadProps {
   query: string;
