@@ -13,7 +13,7 @@ export default function InfoDrawer(props: InfoDrawerProps) {
     return (
 
         <Drawer
-            size={410}
+            size={430}
             open={props.modalActive}
             onClose={props.closeModal}
             direction='bottom'
@@ -31,7 +31,7 @@ export default function InfoDrawer(props: InfoDrawerProps) {
                     Gunakan informasi kesehatanmu
                     saat bertanya agar jawaban lebih relevan dan sesuai.
                 </p>
-                <div className='my-2 p-3 bg-[#F6FAFE] text-sm text-[#72728b] font-bold'>
+                <div className='my-4 p-4 bg-[#F6FAFE] text-sm text-[#72728b] font-bold'>
                     <p>Contoh:</p>
                     <ul className="space-y-2">
                         <li className="flex items-start gap-2">
