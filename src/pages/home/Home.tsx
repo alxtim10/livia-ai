@@ -26,18 +26,21 @@ const Home = () => {
     isLoading,
     topics,
     showModal,
-    toggleDrawer
+    toggleDrawer,
+    models
   } = useHome();
 
   return (
     <section className="fixed inset-0 flex justify-center">
       <section className="relative w-full flex flex-col md:max-w-[740px] bg-white">
         <div ref={chatTopRef} />
-        <div className="absolute top-4 left-4 font-semibold flex items-center gap-3">
-          <Dropdown engine_index={engine_index} setEngine={setEngine} />
+        <div className="absolute px-3 pt-3 pb-3 font-semibold flex items-center gap-3 bg-white w-full">
+          {models && models.length > 0 && (
+            <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
+          )}
           <Info className="text-[#509EE3] w-5" onClick={() => {
             toggleDrawer();
-          }}/>
+          }} />
         </div>
         <section
           className={`flex-1 overflow-y-auto w-full flex flex-col items-center justify-start px-5`}
@@ -59,7 +62,7 @@ const Home = () => {
                     <div
                       key={index}
                       onClick={() => handleGetPrompt(topic)}
-                      className="text-center cursor-pointer border rounded-full text-xs py-1 px-2 border-[#8ABEEC] text-[#8ABEEC]"
+                      className="text-center cursor-pointer border rounded-full text-sm py-1 px-2 border-[#8ABEEC] text-[#8ABEEC]"
                       style={{
                         flexBasis: index < 3 ? "auto" : "auto", // all items auto width
                       }}
