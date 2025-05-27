@@ -21,8 +21,10 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [topics, setTopics] = useState<string[]>();
   const [showModal, setShowModal] = useState(false);
+  const [models, setModels] = useState<{ model_id: string, model_name: string }[]>([]);
+
   const toggleDrawer = () => {
-      setShowModal((prevState) => !prevState)
+    setShowModal((prevState) => !prevState)
   }
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -123,7 +125,7 @@ export const useHome = () => {
       let res;
       if (!image) {
         res = await fetch(
-          `https://ftmobile.inhealth.co.id/livia-ai/api/Gemini/text-only`,
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-only`,
           {
             method: "POST",
             headers: {
@@ -132,6 +134,7 @@ export const useHome = () => {
             },
             body: JSON.stringify({
               prompt: suggestion ? suggestion : query,
+              model: models[engine].model_id
             }),
           }
         );
@@ -155,9 +158,10 @@ export const useHome = () => {
         const formData = new FormData();
         formData.append("file", image);
         formData.append("prompt", suggestion ? suggestion : query);
+        formData.append("model", models[engine].model_id);
 
         res = await fetch(
-          `https://ftmobile.inhealth.co.id/livia-ai/api/Gemini/text-and-image`,
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
           {
             method: "POST",
             headers: {
@@ -216,10 +220,11 @@ export const useHome = () => {
   }
 
   useEffect(() => {
+
     const getNewToken = async () => {
       let res;
       res = await fetch(
-        `https://ftmobile.inhealth.co.id/livia-ai/api/AuthToken/SW5pIGFkYWxhaCBrdW5jaSByYWhhc2lhLCB5YW5nIHN1ZGFoIGRpIGVua3JpcHNpIG1lbmdndW5ha2FuIGJhc2U2NC4gVG9sb25nIGRpamFnYSBiYWlrLWJhaWsgeWFhLg==`,
+        `${process.env.REACT_APP_API_LIVIA}/AuthToken/${process.env.REACT_APP_SECRET_KEY}`,
         {
           method: "GET",
           headers: {
@@ -231,9 +236,31 @@ export const useHome = () => {
       setToken(data.data.token);
     };
     getNewToken();
+
     const randomTopics = getRandomTopics(listTopics);
     setTopics(randomTopics);
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      const getModels = async () => {
+        let res;
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/Model`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setModels(data.data);
+      }
+      getModels();
+    }
+  }, [token])
 
   return {
     textareaRef,
@@ -255,6 +282,7 @@ export const useHome = () => {
     isLoading,
     topics,
     showModal,
-    toggleDrawer
+    toggleDrawer,
+    models
   };
 };
