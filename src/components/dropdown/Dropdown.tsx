@@ -34,7 +34,7 @@ const Dropdown = ({
     <div className="relative inline-block" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-32 gap-1 px-3 pl-4 py-1 rounded-2xl bg-[#E8EFF5] transition-all"
+        className="flex items-center justify-between w-24 gap-1 px-3 pl-4 py-1 rounded-2xl bg-[#E8EFF5] transition-all"
       >
         <span className="text-[16px] text-[#30A7DA]">{models[engine_index].model_name}</span>
         <ChevronDown size={18} className="mt-[2px] text-[#30A7DA]" />
