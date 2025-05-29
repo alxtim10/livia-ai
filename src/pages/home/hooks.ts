@@ -21,15 +21,18 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [topics, setTopics] = useState<string[]>();
   const [showModal, setShowModal] = useState(false);
-  const [models] = useState<{ model_id: string, model_name: string }[]>([{
-    model_id: "gemini-2.5-flash-preview-05-20",
-    model_name: "Livia"
-  }]);
+  const [models] = useState<{ model_id: string; model_name: string }[]>([
+    {
+      model_id: "gemini-2.5-flash-preview-05-20",
+      model_name: "Livia",
+    },
+  ]);
   const [firstLoading, setFirstLoading] = useState<boolean>(true);
+  const [sessionID, setSessionID] = useState<string>();
 
   const toggleDrawer = () => {
-    setShowModal((prevState) => !prevState)
-  }
+    setShowModal((prevState) => !prevState);
+  };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = textareaRef.current;
@@ -79,10 +82,10 @@ export const useHome = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [canDismiss]);
 
@@ -97,7 +100,6 @@ export const useHome = () => {
   };
 
   const handleGetPrompt = async (suggestion?: string) => {
-
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       if (textarea) {
@@ -138,7 +140,8 @@ export const useHome = () => {
             },
             body: JSON.stringify({
               prompt: suggestion ? suggestion : query,
-              model: "gemini-2.5-flash-preview-05-20"
+              model: "gemini-2.5-flash-preview-05-20",
+              session_id: sessionID
             }),
           }
         );
@@ -224,6 +227,11 @@ export const useHome = () => {
   }
 
   useEffect(() => {
+    const generateRandomId = () => {
+      return "Session-" + [...Array(15)].map(() => Math.floor(Math.random() * 10)).join("") + "-" + new Date().toISOString();
+    };
+    const generatedSessionID = generateRandomId();
+    setSessionID(generatedSessionID);
 
     const getNewToken = async () => {
       let res;
@@ -246,10 +254,10 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if(token) {
+    if (token && sessionID) {
       setFirstLoading(false);
     }
-  }, [token])
+  }, [token, sessionID]);
 
   return {
     textareaRef,
@@ -273,7 +281,7 @@ export const useHome = () => {
     showModal,
     toggleDrawer,
     models,
-    firstLoading
+    firstLoading,
   };
 };
 
