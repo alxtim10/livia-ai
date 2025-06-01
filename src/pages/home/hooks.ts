@@ -166,6 +166,7 @@ export const useHome = () => {
         formData.append("file", image);
         formData.append("prompt", suggestion ? suggestion : query);
         formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("session_id", sessionID ?? "");
 
         res = await fetch(
           `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
