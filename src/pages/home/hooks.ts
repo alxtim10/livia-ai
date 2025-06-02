@@ -228,6 +228,7 @@ export const useHome = () => {
   }
 
   useEffect(() => {
+
     const generateRandomId = () => {
       return "Session-" + [...Array(15)].map(() => Math.floor(Math.random() * 10)).join("") + "-" + new Date().toISOString();
     };
@@ -259,6 +260,20 @@ export const useHome = () => {
       setFirstLoading(false);
     }
   }, [token, sessionID]);
+
+  useEffect(() => {
+    const input = textareaRef.current;
+    if (!input) return;
+
+    const handleFocus = () => {
+      setTimeout(() => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100); // Delay helps in iOS
+    };
+
+    input.addEventListener("focus", handleFocus);
+    return () => input.removeEventListener("focus", handleFocus);
+  }, [])
 
   return {
     textareaRef,
