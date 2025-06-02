@@ -21,15 +21,18 @@ export const useHome = () => {
   const [isLoading, setIsLoading] = useState<boolean>();
   const [topics, setTopics] = useState<string[]>();
   const [showModal, setShowModal] = useState(false);
-  const [models] = useState<{ model_id: string, model_name: string }[]>([{
-    model_id: "gemini-2.5-flash-preview-05-20",
-    model_name: "Livia"
-  }]);
+  const [models] = useState<{ model_id: string; model_name: string }[]>([
+    {
+      model_id: "gemini-2.5-flash-preview-05-20",
+      model_name: "Livia",
+    },
+  ]);
   const [firstLoading, setFirstLoading] = useState<boolean>(true);
+  const [sessionID, setSessionID] = useState<string>();
 
   const toggleDrawer = () => {
-    setShowModal((prevState) => !prevState)
-  }
+    setShowModal((prevState) => !prevState);
+  };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const textarea = textareaRef.current;
@@ -79,10 +82,10 @@ export const useHome = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, [canDismiss]);
 
@@ -97,7 +100,6 @@ export const useHome = () => {
   };
 
   const handleGetPrompt = async (suggestion?: string) => {
-
     if (textareaRef.current) {
       const textarea = textareaRef.current;
       if (textarea) {
@@ -138,7 +140,8 @@ export const useHome = () => {
             },
             body: JSON.stringify({
               prompt: suggestion ? suggestion : query,
-              model: "gemini-2.5-flash-preview-05-20"
+              model: "gemini-2.5-flash-preview-05-20",
+              session_id: sessionID
             }),
           }
         );
@@ -163,6 +166,7 @@ export const useHome = () => {
         formData.append("file", image);
         formData.append("prompt", suggestion ? suggestion : query);
         formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("session_id", sessionID ?? "");
 
         res = await fetch(
           `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
@@ -197,10 +201,129 @@ export const useHome = () => {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === loadingMessage.id
-            ? { ...m, text: "Something went wrong.", isLoading: false }
+            ? { ...m, text: "Something went wrong.", isLoading: false, isError: true }
             : m
         )
       );
+    }
+  };
+
+  const handleRetry = async () => {
+    // 1. Get last user message
+    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
+    const lastGeminiMessageIndex = [...messages].map(m => m.isUser).lastIndexOf(false);
+
+    if (!lastUserMessage || lastGeminiMessageIndex === -1) return;
+
+    setIsLoading(true);
+
+    setMessages(prev =>
+      prev.map((m, i) =>
+        i === lastGeminiMessageIndex
+          ? {
+            ...m,
+            isLoading: true,
+          }
+          : m
+      )
+    );
+
+    try {
+      let res;
+
+      if (!image) {
+        // 🔹 Text-only request
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-only`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              prompt: lastUserMessage.text,
+              model: "gemini-2.5-flash-preview-05-20",
+              session_id: sessionID,
+            }),
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === lastGeminiMessageIndex
+              ? {
+                ...m,
+                text: data.data.html,
+                isLoading: false,
+                isError: false,
+              }
+              : m
+          )
+        );
+      } else {
+        // 🔹 Text + Image request
+        const formData = new FormData();
+        formData.append("file", image);
+        formData.append("prompt", lastUserMessage.text);
+        formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("session_id", sessionID ?? "");
+
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === lastGeminiMessageIndex
+              ? {
+                ...m,
+                text: data.data.html,
+                image,
+                isLoading: false,
+                isError: false,
+              }
+              : m
+          )
+        );
+      }
+    } catch (err: any) {
+      console.error("Retry error:", err.message || err);
+      setMessages(prev =>
+        prev.map((m, i) =>
+          i === lastGeminiMessageIndex
+            ? {
+              ...m,
+              text: "Something went wrong.",
+              isLoading: false,
+              isError: true,
+            }
+            : m
+        )
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -225,6 +348,12 @@ export const useHome = () => {
 
   useEffect(() => {
 
+    const generateRandomId = () => {
+      return "Session-" + [...Array(15)].map(() => Math.floor(Math.random() * 10)).join("") + "-" + new Date().toISOString();
+    };
+    const generatedSessionID = generateRandomId();
+    setSessionID(generatedSessionID);
+
     const getNewToken = async () => {
       let res;
       res = await fetch(
@@ -246,10 +375,37 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if(token) {
+    if (token && sessionID) {
       setFirstLoading(false);
     }
-  }, [token])
+  }, [token, sessionID]);
+
+  useEffect(() => {
+    const input = textareaRef.current;
+    if (!input) return;
+
+    const handleFocus = () => {
+      setTimeout(() => {
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100); // Delay helps in iOS
+    };
+
+    input.addEventListener("focus", handleFocus);
+    return () => input.removeEventListener("focus", handleFocus);
+  }, [])
+
+  const [tipsPrompt, setTipsPrompt] = useState(false);
+
+  useEffect(() => {
+    setTipsPrompt(true);
+
+    // Hide after 1.5 seconds
+    const timer = setTimeout(() => {
+      setTipsPrompt(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return {
     textareaRef,
@@ -273,7 +429,9 @@ export const useHome = () => {
     showModal,
     toggleDrawer,
     models,
-    firstLoading
+    firstLoading,
+    handleRetry,
+    tipsPrompt
   };
 };
 

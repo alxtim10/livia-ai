@@ -3,7 +3,7 @@ import animationData from '../../constants/main_loading.json'
 
 const LoadingMain = () => {
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="min-h-[100dvh] flex items-center justify-center">
       <Lottie animationData={animationData} loop autoplay />
     </div>
   )
