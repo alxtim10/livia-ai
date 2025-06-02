@@ -9,3 +9,7 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+.chat-html p {
+  margin-bottom: 15px;
+}
