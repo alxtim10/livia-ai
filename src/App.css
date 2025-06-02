@@ -14,12 +14,15 @@
   margin-bottom: 10px;
 }
 
-.chat-html h1, h2, h3, ol {
+.chat-html h1,
+h2,
+h3,
+ol {
   font-weight: 600;
   margin-top: 10px;
 }
 
-.chat-html li{
+.chat-html li {
   margin-top: 2px;
 }
 
@@ -33,4 +36,13 @@
 
 .chat-html br {
   display: 2px;
+}
+
+@media (max-width: 768px) {
+
+  /* Hide tooltip or disable pointer events on mobile */
+  #copy-tooltip, #retry-tooltip {
+    display: none !important;
+    pointer-events: none;
+  }
 }
