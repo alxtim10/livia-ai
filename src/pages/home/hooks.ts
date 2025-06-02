@@ -201,10 +201,129 @@ export const useHome = () => {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === loadingMessage.id
-            ? { ...m, text: "Something went wrong.", isLoading: false }
+            ? { ...m, text: "Something went wrong.", isLoading: false, isError: true }
             : m
         )
       );
+    }
+  };
+
+  const handleRetry = async () => {
+    // 1. Get last user message
+    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
+    const lastGeminiMessageIndex = [...messages].map(m => m.isUser).lastIndexOf(false);
+
+    if (!lastUserMessage || lastGeminiMessageIndex === -1) return;
+
+    setIsLoading(true);
+
+    setMessages(prev =>
+      prev.map((m, i) =>
+        i === lastGeminiMessageIndex
+          ? {
+            ...m,
+            isLoading: true,
+          }
+          : m
+      )
+    );
+
+    try {
+      let res;
+
+      if (!image) {
+        // 🔹 Text-only request
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-only`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              prompt: lastUserMessage.text,
+              model: "gemini-2.5-flash-preview-05-20",
+              session_id: sessionID,
+            }),
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === lastGeminiMessageIndex
+              ? {
+                ...m,
+                text: data.data.html,
+                isLoading: false,
+                isError: false,
+              }
+              : m
+          )
+        );
+      } else {
+        // 🔹 Text + Image request
+        const formData = new FormData();
+        formData.append("file", image);
+        formData.append("prompt", lastUserMessage.text);
+        formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("session_id", sessionID ?? "");
+
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/Gemini/text-and-image`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          }
+        );
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.message || `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        setMessages(prev =>
+          prev.map((m, i) =>
+            i === lastGeminiMessageIndex
+              ? {
+                ...m,
+                text: data.data.html,
+                image,
+                isLoading: false,
+                isError: false,
+              }
+              : m
+          )
+        );
+      }
+    } catch (err: any) {
+      console.error("Retry error:", err.message || err);
+      setMessages(prev =>
+        prev.map((m, i) =>
+          i === lastGeminiMessageIndex
+            ? {
+              ...m,
+              text: "Something went wrong.",
+              isLoading: false,
+              isError: true,
+            }
+            : m
+        )
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -298,6 +417,7 @@ export const useHome = () => {
     toggleDrawer,
     models,
     firstLoading,
+    handleRetry
   };
 };
 

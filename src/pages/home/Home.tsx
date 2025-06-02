@@ -28,7 +28,8 @@ const Home = () => {
     showModal,
     toggleDrawer,
     models,
-    firstLoading
+    firstLoading,
+    handleRetry
   } = useHome();
 
   return (
@@ -50,13 +51,12 @@ const Home = () => {
           >
             {!isFirstLoad && (
               <section className="w-full flex items-center justify-center px-2 md:max-w-[780px]">
-                <ChatBox messages={messages} />
+                <ChatBox messages={messages} handleRetry={handleRetry} />
               </section>
             )}
             <div ref={chatEndRef} />
           </section>
 
-          {/* Input Area at bottom */}
           <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom md:max-w-[780px]">
             {isFirstLoad && (
               <section className="w-full md:max-w-[780px] mb-10 flex flex-col items-start justify-center px-3">
