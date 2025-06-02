@@ -23,7 +23,6 @@ const Home = () => {
     handlePaste,
     engine_index,
     setEngine,
-    handleFocus,
     isLoading,
     topics,
     showModal,
