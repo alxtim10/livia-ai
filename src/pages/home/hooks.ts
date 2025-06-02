@@ -394,6 +394,19 @@ export const useHome = () => {
     return () => input.removeEventListener("focus", handleFocus);
   }, [])
 
+  const [tipsPrompt, setTipsPrompt] = useState(false);
+
+  useEffect(() => {
+    setTipsPrompt(true);
+
+    // Hide after 1.5 seconds
+    const timer = setTimeout(() => {
+      setTipsPrompt(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return {
     textareaRef,
     chatTopRef,
@@ -417,7 +430,8 @@ export const useHome = () => {
     toggleDrawer,
     models,
     firstLoading,
-    handleRetry
+    handleRetry,
+    tipsPrompt
   };
 };
 

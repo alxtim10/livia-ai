@@ -16,7 +16,7 @@
     "@types/react-dom": "^19.1.2",
     "axios": "^1.8.4",
     "file-saver": "^2.0.5",
-    "framer-motion": "^12.6.5",
+    "framer-motion": "^12.15.0",
     "heic-convert": "^2.1.0",
     "html-react-parser": "^5.2.3",
     "lottie-react": "^2.4.1",

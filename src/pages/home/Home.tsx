@@ -6,6 +6,7 @@ import InfoDrawer from "../../components/drawer-info/InfoDrawer";
 import Hero from "../../components/hero/Hero";
 import LoadingMain from "../../components/loading/LoadingMain";
 import { useHome } from "../home/hooks";
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Home = () => {
   const {
@@ -29,7 +30,8 @@ const Home = () => {
     toggleDrawer,
     models,
     firstLoading,
-    handleRetry
+    handleRetry,
+    tipsPrompt
   } = useHome();
 
   return (
@@ -37,14 +39,31 @@ const Home = () => {
       {!firstLoading ? (
         <div className="relative h-[100dvh] flex flex-col items-center justify-center bg-white p-3 w-full md:max-w-[780px]">
           <div ref={chatTopRef} />
-          <header className="fixed top-0  py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full md:max-w-[780px] z-10">
+          <header className="fixed top-0 py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full md:max-w-[780px] z-10">
             {models && models.length > 0 && (
               <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
             )}
-            <Info className="text-[#509EE3] w-5" onClick={() => {
-              toggleDrawer();
-            }}
-            />
+            <div className="relative">
+              <Info className="text-[#509EE3] w-5" onClick={() => {
+                toggleDrawer();
+              }}
+              />
+              <AnimatePresence>
+                {tipsPrompt && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -150 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -80 }}
+                    transition={{ duration: 0.5 }}
+                    className={`mt-2 absolute mb-2 text-center w-28 group-hover:block px-2 py-2 text-xs text-white bg-[#509EE3] rounded`}>
+                    Tips Prompting
+                    {/* Arrow */}
+                    <div className="absolute bottom-full left-[10px] -translate-x-1/2 w-0 h-0 border-4 border-transparent border-b-[#509EE3]"></div>
+                  </motion.div>
+                )}
+
+              </AnimatePresence>
+            </div>
           </header>
           <section
             className={`flex-1 overflow-y-auto w-full flex flex-col items-center justify-start px-1`}
