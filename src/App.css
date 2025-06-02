@@ -13,3 +13,16 @@
 .chat-html p {
   margin-bottom: 15px;
 }
+
+.chat-html h1, h2, h3, ol {
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.chat-html li{
+  margin-top: 2px;
+}
+
+.chat-html li:last-child {
+  margin-bottom: 15px;
+}

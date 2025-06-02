@@ -39,7 +39,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ text, delay = 20, isUser, isLoa
                     className={`rounded-2xl leading-relaxed h-fit text-black`}>
                     <div className='chat-html !text-[16px] leading-relaxed text-black
              [&_ul]:list-disc [&_ul]:pl-5
-             [&_li]:list-item [&_li]:ml-3 [&_li:first-child]:mt-4 [&_li:last-child]:mb-4 [&_p:first-child]:mt-4 [&_p:last-child]:mb-4'
+             [&_li]:list-item [&_li]:ml-3'
                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                     />
                 </div>
