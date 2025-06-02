@@ -11,7 +11,7 @@
 }
 
 .chat-html p {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .chat-html h1, h2, h3, ol {
@@ -23,6 +23,14 @@
   margin-top: 2px;
 }
 
+.chat-html li:first-child {
+  margin-top: 10px;
+}
+
 .chat-html li:last-child {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
+}
+
+.chat-html br {
+  display: 2px;
 }
