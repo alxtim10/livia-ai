@@ -32,11 +32,11 @@ const Home = () => {
   } = useHome();
 
   return (
-    <>
+    <section className="flex items-center justify-center w-full">
       {!firstLoading ? (
-        <div className="relative h-[100dvh] flex flex-col bg-white p-3">
+        <div className="relative h-[100dvh] flex flex-col items-center justify-center bg-white p-3 w-full md:max-w-[780px]">
           <div ref={chatTopRef} />
-          <header className="fixed top-0 left-0 right-0 py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full z-10">
+          <header className="fixed top-0  py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full md:max-w-[780px] z-10">
             {models && models.length > 0 && (
               <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
             )}
@@ -57,7 +57,7 @@ const Home = () => {
           </section>
 
           {/* Input Area at bottom */}
-          <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom">
+          <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom md:max-w-[780px]">
             {isFirstLoad && (
               <section className="w-full md:max-w-[780px] mb-10 flex flex-col items-start justify-center px-3">
                 <Hero />
@@ -77,7 +77,7 @@ const Home = () => {
                 </div>
               </section>
             )}
-            <div className="px-3 pb-4">
+            <div className="px-3 pb-4 flex items-center justify-center">
               <div
                 className="shadow-sm relative pb-12 p-5 bg-[#FBFCFF] border-[#ededed] border -mt-5
         w-full max-w-[740px] rounded-[24px] min-h-[90px] focus:outline-0 text-sm placeholder:text-sm"
@@ -144,7 +144,7 @@ const Home = () => {
           <LoadingMain />
         </>)}
 
-    </>
+    </section>
   );
 };
 
