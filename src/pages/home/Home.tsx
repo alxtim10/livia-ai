@@ -34,7 +34,7 @@ const Home = () => {
   return (
     <>
       {!firstLoading ? (
-        <div className="h-[100dvh] flex flex-col bg-white p-3">
+        <div className="relative h-[100dvh] flex flex-col bg-white p-3">
           <div ref={chatTopRef} />
           <header className="fixed top-0 left-0 right-0 py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full z-10">
             {models && models.length > 0 && (
@@ -57,7 +57,7 @@ const Home = () => {
           </section>
 
           {/* Input Area at bottom */}
-          <footer className="fixed bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom">
+          <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom">
             {isFirstLoad && (
               <section className="w-full md:max-w-[780px] mb-10 flex flex-col items-start justify-center px-3">
                 <Hero />
