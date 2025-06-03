@@ -76,7 +76,7 @@ const Home = () => {
             <div ref={chatEndRef} />
           </section>
 
-          <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom md:max-w-[780px]">
+          <footer className="absolute bottom-5 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom md:max-w-[780px]">
             {isFirstLoad && (
               <section className="w-full md:max-w-[780px] mb-10 flex flex-col items-start justify-center px-3">
                 <Hero />
