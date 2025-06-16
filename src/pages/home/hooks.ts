@@ -210,8 +210,8 @@ export const useHome = () => {
 
   const handleRetry = async (id: number) => {
     // 1. Get last user message
-    const lastUserMessage = [...messages].find(m => m.id == id - 1);
-    const retryGeminiMessage = [...messages].find(m => m.id == id);
+    const lastUserMessage = [...messages].find(m => m.id === id - 1);
+    const retryGeminiMessage = [...messages].find(m => m.id === id);
 
     if (!lastUserMessage || !retryGeminiMessage) return;
 
