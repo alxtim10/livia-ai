@@ -208,18 +208,18 @@ export const useHome = () => {
     }
   };
 
-  const handleRetry = async () => {
+  const handleRetry = async (id: number) => {
     // 1. Get last user message
-    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
-    const lastGeminiMessageIndex = [...messages].map(m => m.isUser).lastIndexOf(false);
+    const lastUserMessage = [...messages].find(m => m.id == id - 1);
+    const retryGeminiMessage = [...messages].find(m => m.id == id);
 
-    if (!lastUserMessage || lastGeminiMessageIndex === -1) return;
+    if (!lastUserMessage || !retryGeminiMessage) return;
 
     setIsLoading(true);
 
     setMessages(prev =>
       prev.map((m, i) =>
-        i === lastGeminiMessageIndex
+        m.id === retryGeminiMessage.id
           ? {
             ...m,
             isLoading: true,
@@ -258,7 +258,7 @@ export const useHome = () => {
 
         setMessages(prev =>
           prev.map((m, i) =>
-            i === lastGeminiMessageIndex
+            m.id === retryGeminiMessage.id
               ? {
                 ...m,
                 text: data.data.html,
@@ -296,7 +296,7 @@ export const useHome = () => {
 
         setMessages(prev =>
           prev.map((m, i) =>
-            i === lastGeminiMessageIndex
+            m.id === retryGeminiMessage.id
               ? {
                 ...m,
                 text: data.data.html,
@@ -312,7 +312,7 @@ export const useHome = () => {
       console.error("Retry error:", err.message || err);
       setMessages(prev =>
         prev.map((m, i) =>
-          i === lastGeminiMessageIndex
+          m.id === retryGeminiMessage.id
             ? {
               ...m,
               text: "Something went wrong.",
