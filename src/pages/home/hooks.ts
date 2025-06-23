@@ -43,17 +43,6 @@ export const useHome = () => {
     setQuery(e.target.value);
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && query !== "") {
-      e.preventDefault();
-      const textarea = textareaRef.current;
-      if (textarea) {
-        textarea.style.height = "30px";
-      }
-      handleGetPrompt();
-    }
-  };
-
   useEffect(() => {
     if (messages.length <= 2) {
       chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -414,7 +403,6 @@ export const useHome = () => {
     isFirstLoad,
     messages,
     handleInput,
-    handleKeyDown,
     handleGetPrompt,
     chatEndRef,
     image,
