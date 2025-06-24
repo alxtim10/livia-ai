@@ -30,7 +30,9 @@ const Home = () => {
     models,
     firstLoading,
     handleRetry,
-    tipsPrompt
+    tipsPrompt,
+    username,
+    noka
   } = useHome();
 
   return (
@@ -78,7 +80,7 @@ const Home = () => {
           <footer className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-white z-10 safe-bottom md:max-w-[780px]">
             {isFirstLoad && (
               <section className="w-full md:max-w-[780px] mb-10 flex flex-col items-start justify-center px-3">
-                <Hero />
+                <Hero username={username} noka={noka}/>
                 <div className="flex flex-wrap gap-x-2 gap-y-3 max-w-fit mt-4">
                   {topics && topics.map((topic, index) => (
                     <div
