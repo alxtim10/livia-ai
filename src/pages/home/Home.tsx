@@ -1,5 +1,5 @@
 import ChatBox from "../../components/chat-box/ChatBox";
-import { ArrowUp, Info, Square, X } from "lucide-react";
+import { AlignLeft, ArrowUp, Info, Square, X } from "lucide-react";
 import AttachButton from "../../components/attach-button/AttachButton";
 import Dropdown from "../../components/dropdown/Dropdown";
 import InfoDrawer from "../../components/drawer-info/InfoDrawer";
@@ -7,6 +7,8 @@ import Hero from "../../components/hero/Hero";
 import LoadingMain from "../../components/loading/LoadingMain";
 import { useHome } from "../home/hooks";
 import { motion, AnimatePresence } from 'framer-motion';
+import SidebarMenu from "../../components/sidebar-menu/SidebarMenu";
+import { useEffect, useState } from "react";
 
 const Home = () => {
   const {
@@ -33,15 +35,30 @@ const Home = () => {
     tipsPrompt
   } = useHome();
 
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? 'hidden' : 'auto'
+  }, [isOpen])
+
   return (
     <section className="flex items-center justify-center w-full">
+      <SidebarMenu isOpen={isOpen} setIsOpen={setIsOpen}/>
       {!firstLoading ? (
         <div className="relative h-[100dvh] flex flex-col items-center justify-center bg-white p-3 w-full md:max-w-[780px]">
           <div ref={chatTopRef} />
-          <header className="fixed top-0 py-3 px-4 font-semibold flex items-center gap-3 bg-white w-full md:max-w-[780px] z-10">
-            {models && models.length > 0 && (
-              <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
-            )}
+          <header className="fixed top-0 py-3 px-4 font-semibold flex items-center justify-between gap-3 bg-white w-full md:max-w-[780px] z-10">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setIsOpen(true)}
+                className="p-2 text-black"
+                aria-label="Open sidebar"
+              >
+                <AlignLeft className="text-[#30A7DA] w-5" />
+              </button>
+              {models && models.length > 0 && (
+                <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
+              )}
+            </div>
             <div className="relative">
               <Info className="text-[#509EE3] w-5" onClick={() => {
                 toggleDrawer();
@@ -50,14 +67,14 @@ const Home = () => {
               <AnimatePresence>
                 {tipsPrompt && (
                   <motion.div
-                    initial={{ opacity: 0, y: -150 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, y: -150, x: -87 }}
+                    animate={{ opacity: 1, y: 0, x: -87 }}
                     exit={{ opacity: 0, y: -80 }}
                     transition={{ duration: 0.5 }}
                     className={`mt-2 absolute mb-2 text-center w-28 group-hover:block px-2 py-2 text-xs text-white bg-[#509EE3] rounded`}>
                     Tips Prompting
                     {/* Arrow */}
-                    <div className="absolute bottom-full left-[10px] -translate-x-1/2 w-0 h-0 border-4 border-transparent border-b-[#509EE3]"></div>
+                    <div className="absolute bottom-full right-3 w-0 h-0 border-4 border-transparent border-b-[#509EE3]"></div>
                   </motion.div>
                 )}
 
