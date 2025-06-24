@@ -16,12 +16,12 @@ function useQuery() {
 export const useHome = () => {
 
   const params = useQuery();
-  const p = params.get('p');
-  const n = params.get('n');
+  const p = params.get('p'); //username
+  const i = params.get('i'); //noka
 
   useEffect(() => {
-    console.log(p, n);
-  }, [p, n])
+    console.log(p, i);
+  }, [p, i])
 
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
