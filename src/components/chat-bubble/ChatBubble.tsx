@@ -120,7 +120,9 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                             data-tooltip-content="Ulangi"
                             data-tooltip-place="bottom-start"
                             className="hover:bg-gray-100 py-1 px-2 rounded-lg  cursor-pointer"
-                            onClick={handleRetry}
+                            onClick={() => {
+                                handleRetry(messages.id)
+                            }}
                         >
                             <RefreshCw
                                 className="w-[17px]" />

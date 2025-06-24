@@ -15,7 +15,6 @@ const Home = () => {
     isFirstLoad,
     messages,
     handleInput,
-    handleKeyDown,
     handleGetPrompt,
     chatEndRef,
     chatTopRef,
@@ -123,13 +122,10 @@ const Home = () => {
                   disabled={isLoading}
                   onInput={handleInput}
                   value={query}
-                  onKeyDown={handleKeyDown}
-                  // onFocus={handleFocus}
-                  // onBlur={handleFocus}
                   rows={1}
                   onPaste={handlePaste}
                   placeholder="Tanya Livia"
-                  className="outline-none focus:outline-none min-h-[30px] resize-none overflow-hidden text-[16px] transition-all duration-200  w-full bg-transparent placeholder:text-[#a3a3a3]"
+                  className="outline-none focus:outline-none min-h-[30px] max-h-[70px] resize-none overflow-auto text-[16px] transition-all duration-200  w-full bg-transparent placeholder:text-[#a3a3a3]"
                 />
                 {messages.length >= 2 &&
                   messages[messages.length - 1].isLoading ? (
@@ -142,10 +138,11 @@ const Home = () => {
                   </>
                 ) : (
                   <button
+                    disabled={query === '' ? true : false}
                     onClick={() => {
                       handleGetPrompt();
                     }}
-                    className="inline-flex absolute right-3 bottom-3 gap-2 border bg-[#284F71] rounded-full hover:bg-white hover:shadow-md transition-all p-1 items-center text-sm font-medium"
+                    className={`${query === '' ? 'bg-[#0d1c29]' : 'bg-[#284F71] '} inline-flex absolute right-3 bottom-3 gap-2 border rounded-full hover:bg-[#0d1c29] hover:shadow-md transition-all p-1 items-center text-sm font-medium`}
                   >
                     <ArrowUp size={18} className="text-white" />
                   </button>

@@ -1,5 +1,6 @@
-import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { listTopics } from "../../constants";
+import { useLocation } from "react-router-dom";
 export interface MessageType {
   id: number;
   text: string;
@@ -8,7 +9,21 @@ export interface MessageType {
   image?: File | null;
 }
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 export const useHome = () => {
+
+  const params = useQuery();
+  const fullname = params.get('fn') || ''; //fullname
+  const username = params.get('p') || ''; //username
+  const noka = params.get('i') || ''; //noka
+
+  useEffect(() => {
+    console.log(username, noka);
+  }, [username, noka, fullname])
+
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -41,17 +56,6 @@ export const useHome = () => {
       textarea.style.height = textarea.scrollHeight + "px";
     }
     setQuery(e.target.value);
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && query !== "") {
-      e.preventDefault();
-      const textarea = textareaRef.current;
-      if (textarea) {
-        textarea.style.height = "30px";
-      }
-      handleGetPrompt();
-    }
   };
 
   useEffect(() => {
@@ -208,18 +212,18 @@ export const useHome = () => {
     }
   };
 
-  const handleRetry = async () => {
+  const handleRetry = async (id: number) => {
     // 1. Get last user message
-    const lastUserMessage = [...messages].reverse().find(m => m.isUser);
-    const lastGeminiMessageIndex = [...messages].map(m => m.isUser).lastIndexOf(false);
+    const lastUserMessage = [...messages].find(m => m.id === id - 1);
+    const retryGeminiMessage = [...messages].find(m => m.id === id);
 
-    if (!lastUserMessage || lastGeminiMessageIndex === -1) return;
+    if (!lastUserMessage || !retryGeminiMessage) return;
 
     setIsLoading(true);
 
     setMessages(prev =>
       prev.map((m, i) =>
-        i === lastGeminiMessageIndex
+        m.id === retryGeminiMessage.id
           ? {
             ...m,
             isLoading: true,
@@ -258,7 +262,7 @@ export const useHome = () => {
 
         setMessages(prev =>
           prev.map((m, i) =>
-            i === lastGeminiMessageIndex
+            m.id === retryGeminiMessage.id
               ? {
                 ...m,
                 text: data.data.html,
@@ -296,7 +300,7 @@ export const useHome = () => {
 
         setMessages(prev =>
           prev.map((m, i) =>
-            i === lastGeminiMessageIndex
+            m.id === retryGeminiMessage.id
               ? {
                 ...m,
                 text: data.data.html,
@@ -312,7 +316,7 @@ export const useHome = () => {
       console.error("Retry error:", err.message || err);
       setMessages(prev =>
         prev.map((m, i) =>
-          i === lastGeminiMessageIndex
+          m.id === retryGeminiMessage.id
             ? {
               ...m,
               text: "Something went wrong.",
@@ -414,7 +418,6 @@ export const useHome = () => {
     isFirstLoad,
     messages,
     handleInput,
-    handleKeyDown,
     handleGetPrompt,
     chatEndRef,
     image,
@@ -431,7 +434,10 @@ export const useHome = () => {
     models,
     firstLoading,
     handleRetry,
-    tipsPrompt
+    tipsPrompt,
+    username,
+    noka,
+    fullname
   };
 };
 
