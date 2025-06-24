@@ -16,12 +16,13 @@ function useQuery() {
 export const useHome = () => {
 
   const params = useQuery();
+  const fullname = params.get('fn') || ''; //fullname
   const username = params.get('p') || ''; //username
   const noka = params.get('i') || ''; //noka
 
   useEffect(() => {
     console.log(username, noka);
-  }, [username, noka])
+  }, [username, noka, fullname])
 
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
@@ -435,7 +436,8 @@ export const useHome = () => {
     handleRetry,
     tipsPrompt,
     username,
-    noka
+    noka,
+    fullname
   };
 };
 
