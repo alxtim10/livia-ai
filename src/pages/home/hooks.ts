@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { listTopics } from "../../constants";
+import { useLocation } from "react-router-dom";
 export interface MessageType {
   id: number;
   text: string;
@@ -8,7 +9,20 @@ export interface MessageType {
   image?: File | null;
 }
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 export const useHome = () => {
+
+  const params = useQuery();
+  const p = params.get('p');
+  const n = params.get('n');
+
+  useEffect(() => {
+    console.log(p, n);
+  }, [p, n])
+
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
