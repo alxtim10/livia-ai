@@ -30,10 +30,7 @@ const Home = () => {
     models,
     firstLoading,
     handleRetry,
-    tipsPrompt,
-    username,
-    noka,
-    fullname
+    tipsPrompt
   } = useHome();
 
   return (
