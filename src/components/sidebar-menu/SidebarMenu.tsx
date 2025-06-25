@@ -43,13 +43,13 @@ const SidebarMenu = ({ isOpen, setIsOpen }: SidebarMenuProps) => {
                     </div>
                     <Menu className='mt-5 px-1'>
                         <h1 className='text-sm text-gray-500 px-2'>Chats</h1>
-                        <div className='flex flex-col gap-2 mt-1'>
+                        <div className='flex flex-col mt-1'>
                             {listChats.map((item, i) => {
                                 return (
                                     <button
-                                        className='rounded-lg px-2 py-1 text-sm text-left max-w-[250px] text-ellipsis line-clamp-1 hover:bg-gray-100'
+                                        className='rounded-lg p-2 text-sm text-left  text-ellipsis line-clamp-1 hover:bg-gray-100'
                                         key={i}>
-                                        {item}
+                                        <h1 className='max-w-[250px] truncate'>{item}</h1>
                                     </button>
                                 )
                             })}
