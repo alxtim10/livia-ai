@@ -1,4 +1,4 @@
-import { PanelRightDashed, SquarePen } from 'lucide-react';
+import { PanelLeftClose, PanelRightDashed, SquarePen } from 'lucide-react';
 import { Sidebar, Menu } from 'react-pro-sidebar';
 import { listChats } from '../../constants';
 
@@ -12,7 +12,7 @@ const SidebarMenu = ({ isOpen, setIsOpen }: SidebarMenuProps) => {
         <>
             {isOpen && (
                 <div
-                    className={`${isOpen ? 'bg-black/10' : 'bg-black/100'} transition-all duration-200 fixed inset-0 z-40 bg-black/10`}
+                    className={`${isOpen ? 'bg-black/30' : 'bg-black/100'} transition-all duration-200 fixed inset-0 z-40 bg-black/10`}
                     onClick={() => setIsOpen(false)}
                 />
             )}
@@ -30,7 +30,7 @@ const SidebarMenu = ({ isOpen, setIsOpen }: SidebarMenuProps) => {
                             className="p-2 text-black"
                             aria-label="Open sidebar"
                         >
-                            <PanelRightDashed className='w-5 text-[#6f6f6f]' />
+                            <PanelLeftClose className='w-5 text-[#6f6f6f]' />
                         </button>
                     </div>
                     <div 

@@ -53,7 +53,7 @@ const Home = () => {
                 className="p-2 text-black"
                 aria-label="Open sidebar"
               >
-                <AlignLeft className="text-[#30A7DA] w-5" />
+                <AlignLeft className="text-[#6f6f6f] w-5" />
               </button>
               {models && models.length > 0 && (
                 <Dropdown engine_index={engine_index} setEngine={setEngine} models={models} />
