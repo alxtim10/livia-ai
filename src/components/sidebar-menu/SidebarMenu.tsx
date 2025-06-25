@@ -1,4 +1,4 @@
-import { PanelLeftClose, PanelRightDashed, SquarePen } from 'lucide-react';
+import { PanelLeftClose, SquarePen } from 'lucide-react';
 import { Sidebar, Menu } from 'react-pro-sidebar';
 import { listChats } from '../../constants';
 
