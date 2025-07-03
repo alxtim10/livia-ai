@@ -24,6 +24,7 @@ export const useHome = () => {
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
+  const prevLenRef = useRef<number>(messages.length);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const chatTopRef = useRef<HTMLDivElement | null>(null);
   const [image, setImage] = useState<File | null>();
@@ -56,11 +57,16 @@ export const useHome = () => {
   };
 
   useEffect(() => {
-    if (messages.length <= 2) {
+    const prevLen = prevLenRef.current;
+    const currLen = messages.length;
+    const isNewMessage = currLen > prevLen;
+
+    if (!isNewMessage) {
       chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
     } else {
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
+    prevLenRef.current = currLen;
   }, [messages]);
 
   useEffect(() => {
@@ -463,44 +469,3 @@ export const useHome = () => {
     fullname
   };
 };
-
-export function useScrollableNotAtBottom(targetId?: string) {
-  const [isScrollable, setIsScrollable] = useState(false);
-  const [notAtBottom, setNotAtBottom] = useState(false);
-
-  useEffect(() => {
-    const el = targetId
-      ? document.getElementById(targetId)
-      : document.documentElement;
-
-    if (!el) return;
-
-    const checkScroll = () => {
-      const scrollHeight = el.scrollHeight;
-      const clientHeight = el.clientHeight;
-      const scrollTop = el.scrollTop;
-
-      const canScroll = scrollHeight > clientHeight;
-      const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
-      setIsScrollable(canScroll);
-      setNotAtBottom(canScroll && !atBottom);
-    };
-
-    const resizeObserver = new ResizeObserver(checkScroll);
-    resizeObserver.observe(el);
-
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-
-    checkScroll(); // initial check
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [targetId]);
-
-  return { isScrollable, notAtBottom };
-}
