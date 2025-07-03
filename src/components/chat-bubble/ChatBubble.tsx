@@ -144,7 +144,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                     transition={{ duration: 0.2 }}
                     className={`bg-[#eeeeee] py-3 px-4 text-[16px] max-w-[300px] md:max-w-[420px] rounded-2xl flex flex-wrap gap-x-1`}>
                     {messages.image ? (
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 chat-bubble whitespace-pre-line">
                             <img
                                 src={URL.createObjectURL(messages.image)}
                                 alt="preview"
@@ -153,9 +153,9 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                             {messages.text}
                         </div>
                     ) : (
-                        <>
+                        <div className="chat-bubble whitespace-pre-line">
                             {messages.text}
-                        </>
+                        </div>
                     )}
                 </motion.div>
             )}
