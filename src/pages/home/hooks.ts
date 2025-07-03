@@ -20,10 +20,6 @@ export const useHome = () => {
   const username = params.get('p') || ''; //username
   const noka = params.get('i') || ''; //noka
 
-  useEffect(() => {
-    console.log(username, noka);
-  }, [username, noka, fullname])
-
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -44,6 +40,7 @@ export const useHome = () => {
   ]);
   const [firstLoading, setFirstLoading] = useState<boolean>(true);
   const [sessionID, setSessionID] = useState<string>();
+  const [dataSehatku, setDataSehatku] = useState<string>();
 
   const toggleDrawer = () => {
     setShowModal((prevState) => !prevState);
@@ -143,6 +140,7 @@ export const useHome = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
+              data_user: dataSehatku,
               prompt: suggestion ? suggestion : query,
               model: "gemini-2.5-flash-preview-05-20",
               session_id: sessionID
@@ -168,6 +166,9 @@ export const useHome = () => {
       } else {
         const formData = new FormData();
         formData.append("file", image);
+        if (dataSehatku) {
+          formData.append("data_user", dataSehatku);
+        }
         formData.append("prompt", suggestion ? suggestion : query);
         formData.append("model", "gemini-2.5-flash-preview-05-20");
         formData.append("session_id", sessionID ?? "");
@@ -200,7 +201,6 @@ export const useHome = () => {
         );
       }
     } catch (err: any) {
-      console.error("API Error:", err.message || err);
       setIsLoading(false);
       setMessages((prev) =>
         prev.map((m) =>
@@ -246,6 +246,7 @@ export const useHome = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
+              data_user: dataSehatku,
               prompt: lastUserMessage.text,
               model: "gemini-2.5-flash-preview-05-20",
               session_id: sessionID,
@@ -276,6 +277,9 @@ export const useHome = () => {
         // 🔹 Text + Image request
         const formData = new FormData();
         formData.append("file", image);
+        if (dataSehatku) {
+          formData.append("data_user", dataSehatku);
+        }
         formData.append("prompt", lastUserMessage.text);
         formData.append("model", "gemini-2.5-flash-preview-05-20");
         formData.append("session_id", sessionID ?? "");
@@ -313,7 +317,6 @@ export const useHome = () => {
         );
       }
     } catch (err: any) {
-      console.error("Retry error:", err.message || err);
       setMessages(prev =>
         prev.map((m, i) =>
           m.id === retryGeminiMessage.id
@@ -379,10 +382,30 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if (token && sessionID) {
+    if (token && sessionID && username) {
       setFirstLoading(false);
+      const getDataSehatku = async () => {
+        let res;
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/GetDataSehatku`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              username: username,
+            })
+          }
+        );
+        const data = await res.json();
+        let json = JSON.stringify(data.data[0]);
+        setDataSehatku(JSON.stringify(json));
+      };
+      getDataSehatku();
     }
-  }, [token, sessionID]);
+  }, [token, sessionID, username]);
 
   useEffect(() => {
     const input = textareaRef.current;
