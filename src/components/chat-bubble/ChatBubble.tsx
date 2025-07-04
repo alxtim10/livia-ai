@@ -96,7 +96,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                     className={`rounded-2xl leading-relaxed h-fit text-black`}>
                     <div ref={contentRef} className='chat-html !text-[16px] leading-relaxed text-black
              [&_ul]:list-disc [&_ul]:pl-5
-             [&_li]:list-item [&_li]:ml-3'
+             [&_li]:list-item [&_li]:ml-3 [&_table]:border [&_table]:border-black [&_table]:border-collapse
+    [&_th]:border [&_th]:border-black [&_td]:border [&_td]:border-black [&_td]:px-2 [&_td]:py-1'
                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                     />
                     <div className="flex items-center gap-1 mt-2">
