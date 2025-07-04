@@ -389,7 +389,6 @@ export const useHome = () => {
 
   useEffect(() => {
     if (token && sessionID && username) {
-      setFirstLoading(false);
       const getDataSehatku = async () => {
         let res;
         res = await fetch(
@@ -408,8 +407,11 @@ export const useHome = () => {
         const data = await res.json();
         let json = JSON.stringify(data.data[0]);
         setDataSehatku(JSON.stringify(json));
+        setFirstLoading(false);
       };
       getDataSehatku();
+    } else {
+      setFirstLoading(false);
     }
   }, [token, sessionID, username]);
 

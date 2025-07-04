@@ -38,6 +38,10 @@ ol {
   display: 2px;
 }
 
+.chat-html tbody, thead, th, td {
+  border: 1px solid #ddd;
+}
+
 @media (max-width: 768px) {
 
   /* Hide tooltip or disable pointer events on mobile */
