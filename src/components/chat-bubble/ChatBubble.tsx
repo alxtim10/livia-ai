@@ -17,22 +17,36 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
     const [htmlContent, setHtmlContent] = useState<any>('');
 
     useEffect(() => {
-        setHtmlContent('')
-
-        const html = messages.text;
-        const tokens = html.split(/(\s+|<[^>]+>)/).filter(Boolean);
-        let index = 0;
-        let accumulated = '';
-
-        const interval = setInterval(() => {
-            accumulated += tokens[index];
-            setHtmlContent(accumulated);
-            index++;
-            if (index >= tokens.length) {
-                clearInterval(interval);
+        // Reset content immediately when message changes
+        setHtmlContent('');
+        
+        // Use requestAnimationFrame for smoother animation
+        let rafId: number;
+        let startTime: number;
+        const duration = messages.text.length * delay;
+        
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            
+            const charIndex = Math.min(
+                Math.floor((progress / duration) * messages.text.length),
+                messages.text.length
+            );
+            
+            setHtmlContent(messages.text.slice(0, charIndex));
+            
+            if (progress < duration) {
+                rafId = requestAnimationFrame(animate);
             }
-        }, delay)
-    }, [messages.text, delay])
+        };
+        
+        rafId = requestAnimationFrame(animate);
+        
+        return () => {
+            if (rafId) cancelAnimationFrame(rafId);
+        };
+    }, [messages.text, delay]);
 
     const contentRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +110,8 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                     className={`rounded-2xl leading-relaxed h-fit text-black`}>
                     <div ref={contentRef} className='chat-html !text-[16px] leading-relaxed text-black
              [&_ul]:list-disc [&_ul]:pl-5
-             [&_li]:list-item [&_li]:ml-3'
+             [&_li]:list-item [&_li]:ml-3 [&_table]:border [&_table]:border-black [&_table]:border-collapse
+    [&_th]:border [&_th]:border-black [&_td]:border [&_td]:border-black [&_td]:px-2 [&_td]:py-1'
                         dangerouslySetInnerHTML={{ __html: htmlContent }}
                     />
                     <div className="flex items-center gap-1 mt-2">
@@ -144,7 +159,7 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                     transition={{ duration: 0.2 }}
                     className={`bg-[#eeeeee] py-3 px-4 text-[16px] max-w-[300px] md:max-w-[420px] rounded-2xl flex flex-wrap gap-x-1`}>
                     {messages.image ? (
-                        <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-3 chat-bubble whitespace-pre-line">
                             <img
                                 src={URL.createObjectURL(messages.image)}
                                 alt="preview"
@@ -153,9 +168,9 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
                             {messages.text}
                         </div>
                     ) : (
-                        <>
+                        <div className="chat-bubble whitespace-pre-line">
                             {messages.text}
-                        </>
+                        </div>
                     )}
                 </motion.div>
             )}

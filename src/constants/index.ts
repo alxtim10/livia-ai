@@ -42,3 +42,5 @@ export const listTopics = [
   "Gula & Emosi",
   "Pemanasan"
 ];
+
+export const listChats = ['Apakah kamu mengerti tentang', 'Halo bagaimana cara puasa yang baik', 'Saya punya berat badan 150kg', 'List obat batuk yang manjur'];

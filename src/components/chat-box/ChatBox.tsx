@@ -1,3 +1,4 @@
+import React from "react";
 import { MessageType } from "../../pages/home/hooks";
 import ChatBubble from "../chat-bubble/ChatBubble";
 
@@ -6,7 +7,7 @@ interface ChatBoxProps {
     handleRetry: any
 }
 
-const ChatBox = ({ messages, handleRetry }: ChatBoxProps) => {
+const ChatBox = React.memo(({ messages, handleRetry }: ChatBoxProps) => {
 
     return (
         <section className="mb-44 mt-12 w-full">
@@ -17,6 +18,6 @@ const ChatBox = ({ messages, handleRetry }: ChatBoxProps) => {
             ))}
         </section>
     )
-}
+});
 
 export default ChatBox

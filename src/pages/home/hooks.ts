@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { listTopics } from "../../constants";
 import { useLocation } from "react-router-dom";
+import { debounce } from "lodash";
 export interface MessageType {
   id: number;
   text: string;
@@ -20,14 +21,11 @@ export const useHome = () => {
   const username = params.get('p') || ''; //username
   const noka = params.get('i') || ''; //noka
 
-  useEffect(() => {
-    console.log(username, noka);
-  }, [username, noka, fullname])
-
   const [query, setQuery] = useState<string>("");
   const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [messages, setMessages] = useState<MessageType[]>([]);
+  const prevLenRef = useRef<number>(messages.length);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const chatTopRef = useRef<HTMLDivElement | null>(null);
   const [image, setImage] = useState<File | null>();
@@ -44,26 +42,40 @@ export const useHome = () => {
   ]);
   const [firstLoading, setFirstLoading] = useState<boolean>(true);
   const [sessionID, setSessionID] = useState<string>();
+  const [dataSehatku, setDataSehatku] = useState<string>();
 
   const toggleDrawer = () => {
     setShowModal((prevState) => !prevState);
   };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    }
     setQuery(e.target.value);
+    const debouncedResize = debounce(() => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      }
+    }, 100);
+    debouncedResize();
   };
 
   useEffect(() => {
-    if (messages.length <= 2) {
-      chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    const scrollToMessage = () => {
+      requestAnimationFrame(() => {
+        const prevLen = prevLenRef.current;
+        const currLen = messages.length;
+        const isNewMessage = currLen > prevLen;
+
+        if (!isNewMessage) {
+          chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
+        } else {
+          chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+        prevLenRef.current = currLen;
+      })
+    };
+    scrollToMessage();
   }, [messages]);
 
   useEffect(() => {
@@ -143,8 +155,9 @@ export const useHome = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
+              data_user: dataSehatku,
               prompt: suggestion ? suggestion : query,
-              model: "gemini-2.5-flash-preview-05-20",
+              model: "gemini-2.5-flash-lite-preview-06-17",
               session_id: sessionID
             }),
           }
@@ -168,8 +181,11 @@ export const useHome = () => {
       } else {
         const formData = new FormData();
         formData.append("file", image);
+        if (dataSehatku) {
+          formData.append("data_user", dataSehatku);
+        }
         formData.append("prompt", suggestion ? suggestion : query);
-        formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("model", "gemini-2.5-flash-lite-preview-06-17");
         formData.append("session_id", sessionID ?? "");
 
         res = await fetch(
@@ -200,7 +216,6 @@ export const useHome = () => {
         );
       }
     } catch (err: any) {
-      console.error("API Error:", err.message || err);
       setIsLoading(false);
       setMessages((prev) =>
         prev.map((m) =>
@@ -246,6 +261,7 @@ export const useHome = () => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
+              data_user: dataSehatku,
               prompt: lastUserMessage.text,
               model: "gemini-2.5-flash-preview-05-20",
               session_id: sessionID,
@@ -276,6 +292,9 @@ export const useHome = () => {
         // 🔹 Text + Image request
         const formData = new FormData();
         formData.append("file", image);
+        if (dataSehatku) {
+          formData.append("data_user", dataSehatku);
+        }
         formData.append("prompt", lastUserMessage.text);
         formData.append("model", "gemini-2.5-flash-preview-05-20");
         formData.append("session_id", sessionID ?? "");
@@ -313,7 +332,6 @@ export const useHome = () => {
         );
       }
     } catch (err: any) {
-      console.error("Retry error:", err.message || err);
       setMessages(prev =>
         prev.map((m, i) =>
           m.id === retryGeminiMessage.id
@@ -379,10 +397,32 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
-    if (token && sessionID) {
+    if (token && sessionID && username) {
+      const getDataSehatku = async () => {
+        let res;
+        res = await fetch(
+          `${process.env.REACT_APP_API_LIVIA}/GetDataSehatku`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              username: username,
+            })
+          }
+        );
+        const data = await res.json();
+        let json = JSON.stringify(data.data[0]);
+        setDataSehatku(JSON.stringify(json));
+        setFirstLoading(false);
+      };
+      getDataSehatku();
+    } else {
       setFirstLoading(false);
     }
-  }, [token, sessionID]);
+  }, [token, sessionID, username]);
 
   useEffect(() => {
     const input = textareaRef.current;
@@ -440,44 +480,3 @@ export const useHome = () => {
     fullname
   };
 };
-
-export function useScrollableNotAtBottom(targetId?: string) {
-  const [isScrollable, setIsScrollable] = useState(false);
-  const [notAtBottom, setNotAtBottom] = useState(false);
-
-  useEffect(() => {
-    const el = targetId
-      ? document.getElementById(targetId)
-      : document.documentElement;
-
-    if (!el) return;
-
-    const checkScroll = () => {
-      const scrollHeight = el.scrollHeight;
-      const clientHeight = el.clientHeight;
-      const scrollTop = el.scrollTop;
-
-      const canScroll = scrollHeight > clientHeight;
-      const atBottom = scrollTop + clientHeight >= scrollHeight - 1;
-
-      setIsScrollable(canScroll);
-      setNotAtBottom(canScroll && !atBottom);
-    };
-
-    const resizeObserver = new ResizeObserver(checkScroll);
-    resizeObserver.observe(el);
-
-    window.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
-
-    checkScroll(); // initial check
-
-    return () => {
-      resizeObserver.disconnect();
-      window.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
-    };
-  }, [targetId]);
-
-  return { isScrollable, notAtBottom };
-}
