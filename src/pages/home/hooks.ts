@@ -157,7 +157,7 @@ export const useHome = () => {
             body: JSON.stringify({
               data_user: dataSehatku,
               prompt: suggestion ? suggestion : query,
-              model: "gemini-2.5-flash-preview-05-20",
+              model: "gemini-2.5-flash-lite-preview-06-17",
               session_id: sessionID
             }),
           }
@@ -185,7 +185,7 @@ export const useHome = () => {
           formData.append("data_user", dataSehatku);
         }
         formData.append("prompt", suggestion ? suggestion : query);
-        formData.append("model", "gemini-2.5-flash-preview-05-20");
+        formData.append("model", "gemini-2.5-flash-lite-preview-06-17");
         formData.append("session_id", sessionID ?? "");
 
         res = await fetch(
