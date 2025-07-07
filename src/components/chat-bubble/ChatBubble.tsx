@@ -17,22 +17,36 @@ const ChatBubble: React.FC<ChatBubbleProps> = ({ messages, delay = 10, handleRet
     const [htmlContent, setHtmlContent] = useState<any>('');
 
     useEffect(() => {
-        setHtmlContent('')
-
-        const html = messages.text;
-        const tokens = html.split(/(\s+|<[^>]+>)/).filter(Boolean);
-        let index = 0;
-        let accumulated = '';
-
-        const interval = setInterval(() => {
-            accumulated += tokens[index];
-            setHtmlContent(accumulated);
-            index++;
-            if (index >= tokens.length) {
-                clearInterval(interval);
+        // Reset content immediately when message changes
+        setHtmlContent('');
+        
+        // Use requestAnimationFrame for smoother animation
+        let rafId: number;
+        let startTime: number;
+        const duration = messages.text.length * delay;
+        
+        const animate = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+            const progress = timestamp - startTime;
+            
+            const charIndex = Math.min(
+                Math.floor((progress / duration) * messages.text.length),
+                messages.text.length
+            );
+            
+            setHtmlContent(messages.text.slice(0, charIndex));
+            
+            if (progress < duration) {
+                rafId = requestAnimationFrame(animate);
             }
-        }, delay)
-    }, [messages.text, delay])
+        };
+        
+        rafId = requestAnimationFrame(animate);
+        
+        return () => {
+            if (rafId) cancelAnimationFrame(rafId);
+        };
+    }, [messages.text, delay]);
 
     const contentRef = useRef<HTMLDivElement>(null);
 
