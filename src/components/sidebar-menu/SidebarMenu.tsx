@@ -1,6 +1,7 @@
 import { PanelLeftClose, SquarePen } from 'lucide-react';
 import { Sidebar, Menu } from 'react-pro-sidebar';
 import { listChats } from '../../constants';
+import { useEffect, useState } from 'react';
 
 interface SidebarMenuProps {
     isOpen: boolean,
@@ -8,20 +9,71 @@ interface SidebarMenuProps {
 }
 
 const SidebarMenu = ({ isOpen, setIsOpen }: SidebarMenuProps) => {
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsAnimating(true);
+        } else {
+            const timer = setTimeout(() => setIsAnimating(false), 400); // Match new animation duration
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
     return (
         <>
-            {isOpen && (
+            {(isOpen || isAnimating) && (
                 <div
-                    className={`${isOpen ? 'bg-black/30' : 'bg-black/100'} transition-all duration-200 fixed inset-0 z-40 bg-black/10`}
+                    className={`fixed inset-0 z-40 ${isOpen ? 'animate-fade-in-overlay' : 'animate-fade-out-overlay'}`}
                     onClick={() => setIsOpen(false)}
                 />
             )}
+            <style>
+                {`
+                    @keyframes fadeInOverlay {
+                        from { 
+                            background-color: rgba(0, 0, 0, 0);
+                            backdrop-filter: blur(0px);
+                        }
+                        to { 
+                            background-color: rgba(0, 0, 0, 0.2);
+                            backdrop-filter: blur(2px);
+                        }
+                    }
+                    @keyframes fadeOutOverlay {
+                        from { 
+                            background-color: rgba(0, 0, 0, 0.2);
+                            backdrop-filter: blur(2px);
+                        }
+                        to { 
+                            background-color: rgba(0, 0, 0, 0);
+                            backdrop-filter: blur(0px);
+                        }
+                    }
+                    .animate-fade-in-overlay {
+                        animation: fadeInOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                    }
+                    .animate-fade-out-overlay {
+                        animation: fadeOutOverlay 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                    }
+                    .sidebar-content {
+                        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        transform-origin: left center;
+                    }
+                    .sidebar-content-enter {
+                        transform: scale(0.98);
+                    }
+                    .sidebar-content-enter-active {
+                        transform: scale(1);
+                    }
+                `}
+            </style>
             <div className={`fixed top-0 left-0 z-50 h-full w-[280px] 
-            bg-white transition-transform duration-300 
-            ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            bg-white transition-all duration-300 ease-in-out
+            ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full shadow-none'}`}>
                 <Sidebar
-                width='280px'
-                    className='p-1'
+                    width='280px'
+                    className={`p-1 sidebar-content ${isOpen ? 'sidebar-content-enter-active' : 'sidebar-content-enter'}`}
                     backgroundColor='white'>
                     <div className='flex items-center justify-between p-2'>
                         <img src="/images/livia.png" alt="" className="w-8" />
@@ -34,32 +86,17 @@ const SidebarMenu = ({ isOpen, setIsOpen }: SidebarMenuProps) => {
                         </button>
                     </div>
                     <div 
-                    onClick={() => {
-                        window.location.reload();
-                    }}  
-                    className='flex items-center gap-2 mt-1 hover:bg-gray-100 rounded-lg px-2 mx-1 py-1 cursor-pointer'>
+                        onClick={() => {
+                            window.location.reload();
+                        }}  
+                        className='flex items-center gap-2 mt-1 hover:bg-gray-100 rounded-lg px-2 mx-1 py-1 cursor-pointer'>
                         <SquarePen className='w-4 mt-[2px]' />
                         <h1 className='text-sm'>New Chat</h1>
                     </div>
-                    <Menu className='mt-5 px-1'>
-                        <h1 className='text-sm text-gray-500 px-2'>Chats</h1>
-                        <div className='flex flex-col mt-1'>
-                            {listChats.map((item, i) => {
-                                return (
-                                    <button
-                                        className='rounded-lg p-2 text-sm text-left  text-ellipsis line-clamp-1 hover:bg-gray-100'
-                                        key={i}>
-                                        <h1 className='max-w-[250px] truncate'>{item}</h1>
-                                    </button>
-                                )
-                            })}
-                        </div>
-                    </Menu>
                 </Sidebar>
-            </div >
+            </div>
         </>
+    );
+};
 
-    )
-}
-
-export default SidebarMenu
+export default SidebarMenu;
