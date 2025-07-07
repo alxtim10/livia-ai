@@ -1,6 +1,5 @@
 import { PanelLeftClose, SquarePen } from 'lucide-react';
-import { Sidebar, Menu } from 'react-pro-sidebar';
-import { listChats } from '../../constants';
+import { Sidebar } from 'react-pro-sidebar';
 import { useEffect, useState } from 'react';
 
 interface SidebarMenuProps {
