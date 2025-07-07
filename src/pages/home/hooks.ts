@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { listTopics } from "../../constants";
 import { useLocation } from "react-router-dom";
+import { debounce } from "lodash";
 export interface MessageType {
   id: number;
   text: string;
@@ -48,25 +49,33 @@ export const useHome = () => {
   };
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    }
     setQuery(e.target.value);
+    const debouncedResize = debounce(() => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      }
+    }, 100);
+    debouncedResize();
   };
 
   useEffect(() => {
-    const prevLen = prevLenRef.current;
-    const currLen = messages.length;
-    const isNewMessage = currLen > prevLen;
+    const scrollToMessage = () => {
+      requestAnimationFrame(() => {
+        const prevLen = prevLenRef.current;
+        const currLen = messages.length;
+        const isNewMessage = currLen > prevLen;
 
-    if (!isNewMessage) {
-      chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-    prevLenRef.current = currLen;
+        if (!isNewMessage) {
+          chatTopRef.current?.scrollIntoView({ behavior: "smooth" });
+        } else {
+          chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }
+        prevLenRef.current = currLen;
+      })
+    };
+    scrollToMessage();
   }, [messages]);
 
   useEffect(() => {
