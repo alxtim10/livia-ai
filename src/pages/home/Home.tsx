@@ -32,7 +32,8 @@ const Home = () => {
     models,
     firstLoading,
     handleRetry,
-    tipsPrompt
+    tipsPrompt,
+    previewURL
   } = useHome();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -42,7 +43,7 @@ const Home = () => {
 
   return (
     <section className="flex items-center justify-center w-full">
-      <SidebarMenu isOpen={isOpen} setIsOpen={setIsOpen}/>
+      <SidebarMenu isOpen={isOpen} setIsOpen={setIsOpen} />
       {!firstLoading ? (
         <div className="relative h-[100dvh] flex flex-col items-center justify-center bg-white p-3 w-full md:max-w-[780px]">
           <div ref={chatTopRef} />
@@ -120,11 +121,13 @@ const Home = () => {
                 {image && (
                   <div className="mb-2">
                     <div className="relative inline-block">
-                      <img
-                        src={URL.createObjectURL(image)}
-                        alt="preview"
-                        className="max-h-16 rounded-xl border object-cover border-gray-300"
-                      />
+                      {previewURL && (
+                        <img
+                          src={previewURL}
+                          alt="preview"
+                          className="max-h-16 rounded-xl border object-cover border-gray-300"
+                        />
+                      )}
                       <button
                         onClick={() => setImage(null)}
                         className="absolute -top-1 -right-1 border border-[#aeaeae] bg-white text-[#212121] rounded-full p-1"
@@ -141,6 +144,16 @@ const Home = () => {
                   value={query}
                   rows={1}
                   onPaste={handlePaste}
+                  onKeyDown={(e) => {
+                    const isMobile =
+                      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                      window.innerWidth <= 768; // optional fallback
+
+                    if (!isMobile && e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault(); // prevent newline
+                      handleGetPrompt();  // call your submit function
+                    }
+                  }}
                   placeholder="Tanya Livia"
                   className="outline-none focus:outline-none min-h-[30px] max-h-[70px] resize-none overflow-auto text-[16px] transition-all duration-200  w-full bg-transparent placeholder:text-[#a3a3a3]"
                 />
