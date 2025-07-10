@@ -2,6 +2,7 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { listTopics } from "../../constants";
 import { useLocation } from "react-router-dom";
 import { debounce } from "lodash";
+import imageCompression from 'browser-image-compression';
 export interface MessageType {
   id: number;
   text: string;
@@ -29,6 +30,8 @@ export const useHome = () => {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const chatTopRef = useRef<HTMLDivElement | null>(null);
   const [image, setImage] = useState<File | null>();
+  const [compressedImage, setCompressedImage] = useState<File | null>();
+  const [previewURL, setPreviewURL] = useState<string | null>(null);
   const [engine, setEngine] = useState<number>(0);
   const [token, setToken] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>();
@@ -145,7 +148,7 @@ export const useHome = () => {
 
     try {
       let res;
-      if (!image) {
+      if (!compressedImage) {
         res = await fetch(
           `${process.env.REACT_APP_API_LIVIA}/Gemini/text-only`,
           {
@@ -180,7 +183,7 @@ export const useHome = () => {
         );
       } else {
         const formData = new FormData();
-        formData.append("file", image);
+        formData.append("file", compressedImage);
         if (dataSehatku) {
           formData.append("data_user", dataSehatku);
         }
@@ -250,7 +253,7 @@ export const useHome = () => {
     try {
       let res;
 
-      if (!image) {
+      if (!compressedImage) {
         // 🔹 Text-only request
         res = await fetch(
           `${process.env.REACT_APP_API_LIVIA}/Gemini/text-only`,
@@ -291,7 +294,7 @@ export const useHome = () => {
       } else {
         // 🔹 Text + Image request
         const formData = new FormData();
-        formData.append("file", image);
+        formData.append("file", compressedImage);
         if (dataSehatku) {
           formData.append("data_user", dataSehatku);
         }
@@ -397,6 +400,45 @@ export const useHome = () => {
   }, []);
 
   useEffect(() => {
+    if (!image) {
+      setCompressedImage(null);
+      setPreviewURL(null);
+      return;
+    }
+
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    let objectUrl: string;
+
+    const processImage = async () => {
+      let finalImage = image;
+
+      if (image.size > 1024 * 1024) {
+        try {
+          finalImage = await imageCompression(image, options);
+        } catch (err) {
+          console.error("Compression failed:", err);
+        }
+      }
+      setCompressedImage(finalImage);
+      objectUrl = URL.createObjectURL(finalImage);
+      setPreviewURL(objectUrl);
+    };
+
+    processImage();
+
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [image])
+
+  useEffect(() => {
     if (token && sessionID && username) {
       const getDataSehatku = async () => {
         let res;
@@ -477,6 +519,7 @@ export const useHome = () => {
     tipsPrompt,
     username,
     noka,
-    fullname
+    fullname,
+    previewURL
   };
 };
