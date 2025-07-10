@@ -144,6 +144,16 @@ const Home = () => {
                   value={query}
                   rows={1}
                   onPaste={handlePaste}
+                  onKeyDown={(e) => {
+                    const isMobile =
+                      /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+                      window.innerWidth <= 768; // optional fallback
+
+                    if (!isMobile && e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault(); // prevent newline
+                      handleGetPrompt();  // call your submit function
+                    }
+                  }}
                   placeholder="Tanya Livia"
                   className="outline-none focus:outline-none min-h-[30px] max-h-[70px] resize-none overflow-auto text-[16px] transition-all duration-200  w-full bg-transparent placeholder:text-[#a3a3a3]"
                 />

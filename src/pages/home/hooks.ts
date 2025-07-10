@@ -81,17 +81,6 @@ export const useHome = () => {
     scrollToMessage();
   }, [messages]);
 
-  useEffect(() => {
-    let objectUrl: string | null = null;
-    if (image) {
-      objectUrl = URL.createObjectURL(image);
-    }
-
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [image]);
-
   const [canDismiss, setCanDismiss] = useState(false);
 
   useEffect(() => {
